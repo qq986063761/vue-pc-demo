@@ -136,3 +136,42 @@ export function getScrollParents(el) {
   upQuery(el);
   return arr;
 }
+
+// 获取父节点
+export function getParent(el) {
+  return (el.host && el !== document && el.host.nodeType)
+    ? el.host
+    : el.parentNode;
+}
+
+/**
+ * 获取指定选择器的祖先元素
+ * @param {HTMLElement} el 元素
+ * @param {String} selector 选择器
+ * @param {HTMLElement} ctx 上下文 dom 元素
+ * @param {boolean} includeCTX 查找时，是否包含上下文本身
+ */
+export function closest(el, selector, ctx, includeCTX) {
+  if (el) {
+    ctx = ctx || document;
+
+    do {
+      if (
+        selector != null &&
+        (
+          selector[0] === '>'
+            ? el.parentNode === ctx && matches(el, selector)
+            : matches(el, selector)
+        ) ||
+        includeCTX && el === ctx
+      ) {
+        return el;
+      }
+
+      if (el === ctx) break;
+      el = getParent(el);
+    } while (el);
+  }
+
+  return null;
+}

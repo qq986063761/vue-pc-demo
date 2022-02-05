@@ -24,5 +24,20 @@ export default createRouter({
       name: 'scaleTool',
       component: () => import('@/views/scaleTool.vue') 
     },
+    { 
+      path: '/disableRepeatClick', 
+      name: 'disableRepeatClick',
+      component: () => import('@/views/disableRepeatClick.vue') 
+    },
+    { 
+      path: '/drag', 
+      name: 'drag',
+      component: () => import('@/views/drag.vue') 
+    },
+    { 
+      path: '/reasonableActiveItem', 
+      name: 'reasonableActiveItem',
+      component: () => import('@/views/reasonableActiveItem.vue') 
+    },
   ]
 })

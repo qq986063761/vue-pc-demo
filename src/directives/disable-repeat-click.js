@@ -1,6 +1,6 @@
 // 防重复点击
 export default {
-  inserted(el, binding) {
+  mounted(el, binding) {
     el.addEventListener('click', e => {
       if (!el.disabled) {
         el.disabled = true

@@ -72,7 +72,7 @@ export default {
               label: '拖拽'
             },
             {
-              key: 'reasonablePosItem',
+              key: 'reasonableActiveItem',
               label: '激活到合适的item'
             }
           ]
@@ -90,10 +90,22 @@ export default {
       ]
     }
   },
+  watch: {
+    $route: 'init'
+  },
   methods: {
     onSelect({ item, key, selectedKeys }) {
       console.log({ item, key, selectedKeys })
       this.$router.push({name: key})
+    },
+    init() {
+      if (this.inited) return
+      const rs = this.menus.find(item => item.children.some(child => child.key === this.$route.name))
+      if (rs) {
+        this.openKeys = [rs.key]
+        this.selectedKeys = [this.$route.name]
+      }
+      this.inited = true
     }
   }
 }

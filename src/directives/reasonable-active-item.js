@@ -1,30 +1,26 @@
-import { on, off } from '@/assets/js/utils.js'
-
 function getEl(item) {
   return item.$el || item
 }
 
-// 元素可拖拽
+// 滚动容器滚动时，获取合理的激活 item
 /*
-  v-reasonable-pos-item="{
-    scroller: $refs.scroller, // items 所在滚动容器
-    items: $refs.items, // 列表组件或元素
+  v-reasonable-active-item="{
+    scroller: scroller, // items 所在滚动容器
+    items: items, // 列表组件或元素
     onScroll: onScroll, // 监听滚动
     currentIndex: currentIndex // 当前激活的 index
   }"
  */
 export default {
-  inserted(el, { value }, vnode) {
+  mounted(el, { value }, vnode) {
     el._bindingValue = value
-    
     el._init = () => {
       const {scroller, onScroll} = el._bindingValue || {}
       if (!scroller || !onScroll) return
 
       el._isBindEvent = true
-      on(scroller, 'scroll', el._onScroll)
+      scroller.addEventListener('scroll', el._onScroll)
     }
-
     el._onScroll = event => {
       const {scroller, items, onScroll, currentIndex} = el._bindingValue || {}
       if (!onScroll) return
@@ -88,22 +84,19 @@ export default {
       }
       onScroll.call(vnode.context, event, {index})
     }
-
     // 销毁事件
     el._removeEvents = () => {
       const {scroller} = el._bindingValue || {}
       if (!scroller) return
-
-      off(scroller, 'scroll', el._onScroll)
+      scroller.removeEventListener('scroll', el._onScroll)
     }
-
     el._init(value)
   },
-  componentUpdated(el, {value}, vnode, oldVnode) {
+  updated(el, {value}, vnode, oldVnode) {
     el._bindingValue = value
     if (!el._isBindEvent) el._init(value)
   },
-  unbind(el) {
+  unmounted(el) {
     el._removeEvents()
   }
 }
