@@ -1,0 +1,1 @@
+import{_ as c}from"./index.ae95e4f7.js";import{r as m,o as r,b as s,a}from"./vendor.308c3883.js";const i={methods:{onSubmit({content:o,usrs:e}){console.log({content:o,usrs:e})}}};function p(o,e,u,_,l,n){const t=m("comment-input");return r(),s("div",null,[a(t,{onSubmit:n.onSubmit},null,8,["onSubmit"])])}var b=c(i,[["render",p]]);export{b as default};
