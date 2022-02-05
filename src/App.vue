@@ -60,6 +60,24 @@ export default {
           ]
         },
         {
+          label: '指令',
+          key: 'dir',
+          children: [
+            {
+              key: 'disableRepeatClick',
+              label: '防重复点击'
+            },
+            {
+              key: 'drag',
+              label: '拖拽'
+            },
+            {
+              key: 'reasonablePosItem',
+              label: '激活到合适的item'
+            }
+          ]
+        },
+        {
           label: 'demo',
           key: 'demo',
           children: [

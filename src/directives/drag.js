@@ -4,7 +4,6 @@ import { on, off } from '@/assets/js/utils.js'
 export default {
   inserted(el, { value }) {
     // const {  } = value || {}
-    
     el._init = function () {
       el._helper = {
         el, // 实际上要改变样式的元素，可能拖拽的手柄元素和实际上的元素会有不同
