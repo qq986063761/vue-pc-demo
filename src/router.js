@@ -39,5 +39,10 @@ export default createRouter({
       name: 'reasonableActiveItem',
       component: () => import('@/views/reasonableActiveItem.vue') 
     },
+    { 
+      path: '/inputDirective', 
+      name: 'inputDirective',
+      component: () => import('@/views/inputDirective.vue') 
+    },
   ]
 })

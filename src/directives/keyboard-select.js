@@ -1,3 +1,10 @@
+
+// v-keyboard-select="{
+//   index,
+//   itemClass: 'el-select-dropdown__item',
+//   onChange: onKeyBoardChange, // onKeyBoardChange({index}) {}
+//   onEnter: onKeyBoardEnter
+// }"
 export default {
   bind(el, {value}) {
     const {index, itemClass, onChange, onEnter} = value

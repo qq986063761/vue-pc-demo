@@ -74,6 +74,10 @@ export default {
             {
               key: 'reasonableActiveItem',
               label: '激活到合适的item'
+            },
+            {
+              key: 'inputDirective',
+              label: '输入检查指令'
             }
           ]
         },
