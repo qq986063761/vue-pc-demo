@@ -6,7 +6,7 @@
           很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多很多内容
         </div>
       </div>
-      <scroll-bar :scroller="scroller"></scroll-bar>
+      <suspend-scrollbar :scroller="scroller"></suspend-scrollbar>
     </div>
   </div>
 </template>

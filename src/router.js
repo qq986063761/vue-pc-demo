@@ -15,9 +15,9 @@ export default createRouter({
       component: () => import('@/views/carousel.vue') 
     },
     { 
-      path: '/scrollBar', 
-      name: 'scrollBar',
-      component: () => import('@/views/scrollBar.vue') 
+      path: '/suspendScrollbar', 
+      name: 'suspendScrollbar',
+      component: () => import('@/views/suspendScrollbar.vue') 
     },
     { 
       path: '/scaleTool', 

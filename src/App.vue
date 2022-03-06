@@ -50,7 +50,7 @@ export default {
               label: '评论'
             },
             {
-              key: 'scrollBar',
+              key: 'suspendScrollbar',
               label: '悬浮滚动条'
             },
             {

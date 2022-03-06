@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="suspending-scrollbar" 
+    class="suspend-scrollbar" 
     :style="outStyle"
     v-show="style">
     <div 
@@ -16,7 +16,7 @@
   import {debounce} from 'throttle-debounce'
 
   export default {
-    name: 'scrollBar',
+    name: 'suspendScrollbar',
     props: {
       scroller: HTMLElement, // 以哪个容器滚动为参考
     },
@@ -33,6 +33,7 @@
       init(scroller, oldScroller) {
         if (!this.scroller) return
         this.scrollers = getScrollParents(this.$el).filter(el => el !== this.scroller)
+
         if (!this.scrollers.length) return
         this.scrollers.forEach(el => el.addEventListener('scroll', this.update))
         window.addEventListener('resize', this.update)
@@ -76,22 +77,29 @@
         this.prevUserSelect = document.body.style.userSelect;
         document.body.style.userSelect = 'none';
       },
-      onUpate(event) {
+      onUpdate(event) {
         const isScrollEvent = event && event.type !== 'resize'
         if (isScrollEvent) {
           // 如果垂直位置没变化就不用更新状态
-          if (event.target.scrollTop === event.target._prevScrollTop) return
-          event.target._prevScrollTop = event.target.scrollTop
+          if (event.target.scrollTop &&
+            this.scroller._parentPrevScrollTop &&
+            event.target.scrollTop === this.scroller._parentPrevScrollTop) {
+            return
+          }
+          this.scroller._parentPrevScrollTop = event.target.scrollTop
         }
         // 内部都没有滚动内容就不需要继续了
-        if (!this.scroller || this.scroller.scrollWidth === this.scroller.clientWidth) return
+        if (!this.scroller || this.scroller.scrollWidth === this.scroller.clientWidth) {
+          return
+        }
 
         const mountScroller = (isScrollEvent ? event.target : this.scrollers[0]) || document.body
         const mountScrollRect = mountScroller.getBoundingClientRect()
         const scrollBarHeight = (mountScroller.offsetHeight - mountScroller.clientHeight) || 0
         const scrollRect = this.scroller.getBoundingClientRect()
-        const isShow = scrollRect.bottom > mountScrollRect.bottom
-
+        const isContainHalf = scrollRect.top < mountScrollRect.bottom && scrollRect.bottom > mountScrollRect.bottom
+        const isShow = isContainHalf
+        
         this.outStyle = {
           left: scrollRect.left + 'px',
           top: (mountScrollRect.bottom - 15 - scrollBarHeight) + 'px',
@@ -115,7 +123,7 @@
       }
     },
     mounted() {
-      this.update = debounce(100, this.onUpate)
+      this.update = debounce(100, this.onUpdate)
       this.init()
     },
     beforeDestroy() {
@@ -126,7 +134,7 @@
 </script>
 
 <style lang="scss">
-  .suspending-scrollbar {
+  .suspend-scrollbar {
     position: fixed;
     height: 15px;
     width: 100%;
