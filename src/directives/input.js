@@ -93,8 +93,8 @@ function initEvents(el, binding, vnode, oldVnode) {
 
 export default {
   mounted(el, binding, vnode, oldVnode) {
-    check(el, binding, vnode, oldVnode)
     if (binding.value !== false) initEvents(el, binding, vnode, oldVnode)
+    check(el, binding, vnode, oldVnode)
   },
   updated(el, binding, vnode, oldVnode) {
     if (binding.value === false) {
