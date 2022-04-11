@@ -23,21 +23,25 @@ export default {
               let currentIndex = el._keyboardSelect.index
               if (code === 38) {
                 currentIndex--
-                if (currentIndex < 0) return
+                if (currentIndex < -1) return
               } else {
                 currentIndex++
               }
               // 对看不到的元素重新滚动定位到指定位置
               if (itemClass) {
                 const children = el.querySelectorAll('.' + itemClass)
-                const rsEl = children && children[currentIndex]
-                if (rsEl) {
-                  const rect = el.getBoundingClientRect()
-                  const rsElRect = rsEl.getBoundingClientRect()
-                  if (rsElRect.top >= rect.bottom) {
-                    el.scrollTop += rsElRect.height * 2
-                  } else if (rsElRect.bottom <= rect.top) {
-                    el.scrollTop -= rsElRect.height * 2
+                if (children) {
+                  const rsEl = children[currentIndex]
+                  if (rsEl) {
+                    const rect = el.getBoundingClientRect()
+                    const rsElRect = rsEl.getBoundingClientRect()
+                    if (rsElRect.top >= rect.bottom) {
+                      el.scrollTop += rsElRect.height * 2
+                    } else if (rsElRect.bottom <= rect.top) {
+                      el.scrollTop -= rsElRect.height * 2
+                    }
+                  } else if (currentIndex > children.length) {
+                    return
                   }
                 }
               }
