@@ -24,6 +24,9 @@
     },
     methods: {
       onOpen() {
+        // 如果全局有被拖拽的行为，就不执行点击
+        if (window.isDragged) return
+
         this.open = !this.open
         if (!this.data.children) {
           this.data.children = [{}, {}, {}]
