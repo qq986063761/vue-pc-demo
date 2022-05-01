@@ -6,13 +6,7 @@
       :style="{height: height + 'px'}"
       @mousemove="onMouseMove">
       <div class="window-content" v-show="!isClose">
-        <div class="target" :class="{center: type === 'tb'}" :style="targetStyle">
-          <div class="target-item" 
-            v-for="(item, i) in data" 
-            :key="i"
-            :style="targetItemStyle">
-          </div>
-        </div>
+        <canvas ref="canvas"></canvas>
         <div
           class="drag-window"
           :class="{dragging: dragging}"
@@ -45,12 +39,10 @@
   export default {
     name: 'scaleTool',
     props: {
-      data: {
-        type: Array,
-        default: () => []
-      },
-      // tb：从上到下 tree 形布局，默认从左到右 tree 形布局
-      type: String,
+      // 用于绘制缩放图上的节点类名
+      nodeClass: String,
+      // 初始化显示位置，center：居中
+      placement: String,
       scroller: HTMLElement,
       content: HTMLElement,
     },
@@ -64,8 +56,6 @@
         isClose: false,
         // 拖拽窗口和目标样式
         dragWinStyle: null,
-        targetStyle: null,
-        targetItemStyle: null,
         // 缩放值
         scaleVal: 100,
       }
@@ -73,7 +63,7 @@
     watch: {
       scroller(val, oldVal) {
         this.offScrollerEvents(oldVal)
-        this.init({init: true}) 
+        this.init({init: true})
       },
       content(val, oldVal) {
         this.offContentEvents(oldVal)
@@ -81,9 +71,8 @@
       },
       data: {
         handler(val) {
-          this.setTargetItemStyle()
-        },
-        immediate: true
+          this.drawNode()
+        }
       }
     },
     methods: {
@@ -139,26 +128,47 @@
           window.isDragged = false
         }, 200)
       },
+      // 监听鼠标滚轮
       onWheel(event) {
-        const {deltaY} = event
-        // 内容向上滚动
-        if (deltaY) {
-          let contentOffsetY = this.contentOffsetY - deltaY
-          let offsetY = contentOffsetY * -this.scale + this.initOffsetY
-          // 避免移出边界
-          if (offsetY < 0) {
-            offsetY = 0
-            contentOffsetY = (offsetY - this.initOffsetY) / -this.scale
-          } else if (offsetY > (this.height - this.dragWinHeight)) {
-            offsetY = this.height - this.dragWinHeight
-            contentOffsetY = (offsetY - this.initOffsetY) / -this.scale
+        event.preventDefault()
+        const {deltaY, deltaX} = event
+        if (deltaY || deltaX) {
+          // 内容上下滚动
+          if (deltaY) {
+            let contentOffsetY = this.contentOffsetY - deltaY
+            let offsetY = contentOffsetY * -this.scale + this.initOffsetY
+            // 避免移出边界
+            if (offsetY < 0) {
+              offsetY = 0
+              contentOffsetY = (offsetY - this.initOffsetY) / -this.scale
+            } else if (offsetY > (this.height - this.dragWinHeight)) {
+              offsetY = this.height - this.dragWinHeight
+              contentOffsetY = (offsetY - this.initOffsetY) / -this.scale
+            }
+            
+            this.offsetY = offsetY
+            this.contentOffsetY = contentOffsetY
           }
-          
-          // 同步更新窗口样式
-          this.offsetY = offsetY
-          this.updateWin()
 
-          this.contentOffsetY = contentOffsetY
+          // 内容左右滚动
+          if (deltaX) {
+            let contentOffsetX = this.contentOffsetX - deltaX
+            let offsetX = contentOffsetX * -this.scale + this.initOffsetX
+            // 避免移出边界
+            if (offsetX < 0) {
+              offsetX = 0
+              contentOffsetX = (offsetX - this.initOffsetX) / -this.scale
+            } else if (offsetX > (this.width - this.dragWinWidth)) {
+              offsetX = this.width - this.dragWinWidth
+              contentOffsetX = (offsetX - this.initOffsetX) / -this.scale
+            }
+            
+            this.offsetX = offsetX
+            this.contentOffsetX = contentOffsetX
+          }
+
+          // 同步更新窗口样式
+          this.updateWin()
           this.updateContent()
         }
       },
@@ -271,28 +281,44 @@
           'transform': `translate3d(${this.offsetX}px, ${this.offsetY}px, 0)`
         }
       },
-      setTargetItemStyle() {
-        this.targetItemStyle = {
-          width: `${230 * this.scale}px`,
-          height: `${this.data.length <= 1 ? 25 : (this.targetHeight / this.data.length)}px`
+      // 绘制缩放节点小图
+      drawNode: debounce(500, function () {
+        const {canvas} = this.$refs
+
+        if (!this.nodeClass || !canvas) return
+
+        // 绘制 canvas 图
+        if (this.content) {
+          canvas.width = this.nodeBoxWidth
+          canvas.height = this.nodeBoxHeight
+          const context = canvas.getContext('2d')
+          context.fillStyle = '#fff'
+          context.clearRect(0, 0, canvas.width, canvas.height)
+
+          const nodeEls = this.content.querySelectorAll(`.${this.nodeClass}`)
+          const contentRect = this.content.getBoundingClientRect()
+          nodeEls.forEach(nodeEl => {
+            const nodeRect = nodeEl.getBoundingClientRect()
+            const left = (nodeRect.left - contentRect.left) * this.scale
+            const top = (nodeRect.top - contentRect.top) * this.scale
+            const width = nodeRect.width * this.scale
+            const height = nodeRect.height * this.scale
+            context.fillRect(left, top, width, height)
+          })
         }
-      },
+      }),
       initWin() {
         let contentWidth = this.content.offsetWidth
         let contentHeight = this.content.offsetHeight
         let dragWinWidth = this.scroller.offsetWidth
         let dragWinHeight = this.scroller.offsetHeight
 
-        let scaleWRatio = (this.width - 40) / contentWidth
-        let scaleHRatio = (this.height - 20) / contentHeight
+        let scaleWRatio = (this.width - 20) / contentWidth
+        let scaleHRatio = (this.height - 10) / contentHeight
         this.scale = Math.min(scaleWRatio, scaleHRatio)
        
-        this.targetWidth = contentWidth * this.scale
-        this.targetHeight = contentHeight * this.scale
-        this.targetStyle = {
-          width: `${this.targetWidth}px`,
-          height: `${this.targetHeight}px`,
-        }
+        this.nodeBoxWidth = contentWidth * this.scale
+        this.nodeBoxHeight = contentHeight * this.scale
 
         // 实际上缩小后的窗口宽高
         this.dragWinWidth = dragWinWidth * this.scale
@@ -305,19 +331,19 @@
           height: `${this.dragWinHeight}px`,
         }
 
-        this.initOffsetX = (this.width - this.targetWidth) / 2
-        this.initOffsetY = (this.height - this.targetHeight) / 2
+        this.initOffsetX = (this.width - this.nodeBoxWidth) / 2
+        this.initOffsetY = (this.height - this.nodeBoxHeight) / 2
 
-        this.setTargetItemStyle()
+        this.drawNode()
 
         // 如果我没有对界面做过任何操作导致的内容大小变化，则初始化窗口位置
         if (!this.clicked) {
           this.offsetX = this.initOffsetX
           this.offsetY = this.initOffsetY
 
-          // 如果从上到下默认布局初始化移动到中间
-          if (this.type === 'tb') {
-            this.offsetX += (this.targetWidth - this.dragWinWidth) / 2
+          // 初始化定位居中
+          if (this.placement === 'center') {
+            this.offsetX += (this.nodeBoxWidth - this.dragWinWidth) / 2
             this.contentOffsetX = (this.offsetX - this.initOffsetX) / -this.scale
           }
 
@@ -404,22 +430,6 @@
         cursor: grab;
         &.dragging {
           cursor: grabbing;
-        }
-      }
-      .target {
-        &.center {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .target-item {
-          &:after {
-            display: block;
-            height: 60%;
-            width: 100%;
-            background: #FFFFFD;
-            content: '';
-          }
         }
       }
     }

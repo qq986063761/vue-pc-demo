@@ -2,15 +2,22 @@
   <div class="scale-tool-demo">
     <div class="scroller" ref="scroller">
       <div ref="content" class="content">
-        <div class="item" v-for="item in data" :key="item"></div>
+        <node :data="item" v-for="item in data" :key="item"></node>
       </div>
     </div>
-    <scale-tool :data="data" :scroller="scroller" :content="content"></scale-tool>
+    <scale-tool 
+      node-class="node-content"
+      :scroller="scroller" 
+      :content="content">
+    </scale-tool>
   </div>
 </template>
 
 <script>
+  import node from './node.vue'
+
   export default {
+    components: {node},
     data() {
       return {
         scroller: null,
@@ -32,13 +39,8 @@
     .scroller {
       height: 100%;
     }
-    .item {
-      width: 200px;
-      height: 150px;
-      background: #fff;
-      + .item {
-        margin-top: 10px;
-      }
+    .content {
+      float: left;
     }
   }
 </style>

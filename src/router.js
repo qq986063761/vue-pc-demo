@@ -22,7 +22,7 @@ export default createRouter({
     { 
       path: '/scaleTool', 
       name: 'scaleTool',
-      component: () => import('@/views/scaleTool.vue') 
+      component: () => import('@/views/scaleTool/scaleTool.vue') 
     },
     { 
       path: '/disableRepeatClick', 
