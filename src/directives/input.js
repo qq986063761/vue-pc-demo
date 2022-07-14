@@ -34,16 +34,25 @@ function check(el, {value}, vnode, oldVnode, type) {
       proxy.setValue('')
       return
     }
-    // 最大值、最小值
-    if (max && num > max) {
-      proxy.setValue(max)
-      return
-    }
+    
+    // 最小值
     if (min && num < min) {
       proxy.setValue(min)
       return
     }
   } else {
+    // 最大值
+    if (max && num > max) {
+      proxy.setValue(max)
+      return
+    }
+
+    // 负数
+    if (!minus && valStr[0] === '-') {
+      proxy.setValue('')
+      return false
+    }
+
     // 负数
     if (minus && valStr[0] === '-') {
       if (valStr.length > 1 && isNaN(num)) {
